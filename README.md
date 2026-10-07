@@ -20,6 +20,7 @@ ComfyUI custom nodes by **Violet Diffusion AI**: typed model loaders, a LoRA loa
 - **Model libraries:** use a Stability Matrix or any other model tree as it is, with no moving or symlinks.
 - **Network sources:** browse another computer's ComfyUI models (browse only) over its stock API.
 - **Typed loaders, Violet Text Encoder** (presets and an optional LLM enhancer), **image tools** (Save Image, Size + Resize, Image Compare). Full list in [docs/NODE_REFERENCE.md](docs/NODE_REFERENCE.md).
+- **What is next:** the rest of the nodes and the standalone versions are planned in [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Install
 
