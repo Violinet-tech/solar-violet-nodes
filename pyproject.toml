@@ -1,6 +1,6 @@
 [project]
 name = "solar-violet-nodes"
-version = "1.0.0"
+version = "1.1.0"
 description = "Solar Violet Nodes: typed model loaders, LoRA loader, model and LoRA browser with duplicate finder, text encoder, image tools, image to image workflow"
 authors = [
     {name = "Violet Diffusion AI"}

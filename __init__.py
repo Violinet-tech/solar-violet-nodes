@@ -302,6 +302,10 @@ try:
     async def violet_model_dirs_post(request):
         return web.json_response(model_catalog.save_dirs(await request.json()))
 
+    from . import downloader
+
+    downloader.register(_routes, web, "standalone" if getattr(server.PromptServer.instance, "standalone", False) else "comfyui")
+
     from . import network_sources
 
     @_routes.get("/violet/net/sources")

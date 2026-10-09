@@ -271,9 +271,9 @@ class SolarLoraSymlinkNode:
     FUNCTION = "symlink"
     CATEGORY = "Solar LoRA"
     
-    def symlink(self, lora_list_json, comfyui_loras_dir, overwrite_existing=False, create_backups=True):
+    def symlink(self, lora_list, comfyui_loras_dir, overwrite_existing=False, create_backups=True):
         try:
-            lora_list = json.loads(lora_list_json)
+            lora_list = json.loads(lora_list)
             if isinstance(lora_list, dict) and "error" in lora_list:
                 return (json.dumps({"error": lora_list["error"]}),)
         except json.JSONDecodeError:
@@ -322,22 +322,33 @@ class SolarLoraSymlinkNode:
             
             # Create symlink or junction
             try:
-                if os.name == 'nt':  # Windows
-                    # Use junction for directories, symlink for files
-                    if os.path.isdir(source_path):
-                        # Create junction
-                        os.system(f'mklink /J "{target_path}" "{source_path}"')
-                    else:
-                        # Create symlink
-                        os.system(f'mklink "{target_path}" "{source_path}"')
-                else:  # Linux/macOS
-                    os.symlink(source_path, target_path)
-                
+                how = "Symlink"
+                if os.name == 'nt' and os.path.isdir(source_path):
+                    import subprocess
+                    r = subprocess.run(['cmd', '/c', 'mklink', '/J', target_path, source_path],
+                                       capture_output=True, text=True)
+                    if r.returncode != 0:
+                        raise OSError(r.stderr.strip() or r.stdout.strip())
+                    how = "Junction"
+                else:
+                    try:
+                        os.symlink(source_path, target_path)
+                    except OSError:
+                        # Windows file symlinks need admin or Developer Mode: use a hardlink,
+                        # then a plain copy if the two folders are on different drives.
+                        try:
+                            os.link(source_path, target_path)
+                            how = "Hardlink"
+                        except OSError:
+                            import shutil
+                            shutil.copy2(source_path, target_path)
+                            how = "Copy"
+
                 results.append({
                     "source": source_path,
                     "target": target_path,
                     "success": True,
-                    "message": "Symlink/junction created successfully"
+                    "message": f"{how} created successfully"
                 })
             except Exception as e:
                 results.append({
